@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EVOQUE | Precision Reimagined</title>
+    <!-- Tailwind CSS for layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Premium Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;700;900&family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gold: #c5a059;
+            --dark: #050505;
+            --darker: #000000;
+            --card-bg: #0d0d0d;
+            --accent: #b76e79; /* Subtle Rose accent */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--darker);
+            color: #ffffff;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        .font-luxury { font-family: 'Cinzel', serif; }
+
+        /* Page Section Transitions */
+        .page-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .page-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Minimalist Navigation */
+        .nav-glass {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(25px);
+            border-bottom: 1px solid rgba(197, 160, 89, 0.1);
+        }
+
+        .gold-text { color: var(--gold); }
+        .gold-bg { background-color: var(--gold); color: black; }
+        .gold-border { border-color: var(--gold); }
+
+        /* Elegant Animations */
+        @keyframes subtleFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal-text {
+            animation: subtleFade 1.5s ease-out forwards;
+        }
+
+        .hero-zoom {
+            animation: slowZoom 30s infinite alternate linear;
+        }
+
+        @keyframes slowZoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.15); }
+        }
+
+        /* Watch Product Cards */
+        .watch-card {
+            transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .watch-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(197, 160, 89, 0.4);
+            background: #121212;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar-track { background: var(--darker); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+        /* Notification Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+
+        /* Policy Display Content */
+        .policy-view h2 { font-family: 'Cinzel', serif; font-size: 3rem; margin-bottom: 2rem; color: var(--gold); }
+        .policy-view h3 { font-family: 'Cinzel', serif; font-size: 1.2rem; margin-top: 2rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+        .policy-view p { color: #a1a1a1; line-height: 1.8; margin-bottom: 1.5rem; font-weight: 300; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- STATUS MODAL -->
+    <div id="status-modal" class="modal-overlay">
+        <div class="bg-[#0a0a0a] border border-gold/20 p-12 max-w-md w-full rounded-2xl text-center shadow-2xl relative">
+            <button onclick="closeModal()" class="absolute top-6 right-6 text-gray-500 hover:text-white transition">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <div class="w-16 h-16 border border-gold rounded-full flex items-center justify-center mx-auto mb-8">
+                <i class="fas fa-check text-gold"></i>
+            </div>
+            <h3 class="font-luxury text-2xl mb-4" id="modal-title">Registry Secure</h3>
+            <p class="text-gray-400 text-sm mb-10 leading-relaxed" id="modal-msg">The caliber has been added to your private collection.</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="closeModal()" class="py-4 border border-white/10 rounded-sm text-[9px] uppercase tracking-[0.3em] font-bold hover:bg-white hover:text-black transition">Dismiss</button>
+                <button onclick="toggleCart(); closeModal();" class="gold-bg py-4 rounded-sm text-[9px] uppercase tracking-[0.3em] font-bold hover:brightness-110 transition shadow-xl">The Bag</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <header class="fixed top-0 w-full z-[100] nav-glass">
+        <nav class="container mx-auto px-10 h-24 flex justify-between items-center">
+            <div class="flex items-center gap-20">
+                <div class="cursor-pointer group" onclick="navigateTo('home')">
+                    <span class="font-luxury text-2xl tracking-[0.6em] uppercase font-black transition group-hover:gold-text">EVOQUE</span>
+                </div>
+                <div class="hidden lg:flex items-center space-x-12">
+                    <button onclick="navigateTo('home')" class="nav-btn text-[10px] uppercase font-bold tracking-[0.4em] hover:text-[#c5a059] transition relative group" id="nav-home">
+                        Home
+                        <span class="absolute -bottom-2 left-0 w-0 h-[1px] bg-gold transition-all group-hover:w-full"></span>
+                    </button>
+                    <button onclick="navigateTo('shop')" class="nav-btn text-[10px] uppercase font-bold tracking-[0.4em] hover:text-[#c5a059] transition relative group" id="nav-shop">
+                        All Watches
+                        <span class="absolute -bottom-2 left-0 w-0 h-[1px] bg-gold transition-all group-hover:w-full"></span>
+                    </button>
+                    <button onclick="navigateTo('about')" class="nav-btn text-[10px] uppercase font-bold tracking-[0.4em] hover:text-[#c5a059] transition relative group" id="nav-about">
+                        Heritage
+                        <span class="absolute -bottom-2 left-0 w-0 h-[1px] bg-gold transition-all group-hover:w-full"></span>
+                    </button>
+                    <button onclick="navigateTo('contact')" class="nav-btn text-[10px] uppercase font-bold tracking-[0.4em] hover:text-[#c5a059] transition relative group" id="nav-contact">
+                        Concierge
+                        <span class="absolute -bottom-2 left-0 w-0 h-[1px] bg-gold transition-all group-hover:w-full"></span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-10">
+                <button class="text-gray-400 hover:gold-text transition"><i class="fas fa-search"></i></button>
+                <button onclick="toggleCart()" class="relative group">
+                    <i class="fas fa-shopping-bag text-xl text-gray-400 group-hover:gold-text transition"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 w-4 h-4 gold-bg rounded-full text-[8px] flex items-center justify-center font-black">0</span>
+                </button>
+                <button class="lg:hidden text-gold" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 1. HOME SECTION -->
+        <section id="home" class="page-section active">
+            <!-- Hero -->
+            <div class="relative h-screen flex items-center overflow-hidden bg-black">
+                <div class="absolute inset-0 z-0">
+                    <div class="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent z-10"></div>
+                    <img src="https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?auto=format&fit=crop&q=80&w=2000" class="w-full h-full object-cover hero-zoom opacity-50">
+                </div>
+                
+                <div class="container mx-auto px-10 relative z-20">
+                    <div class="max-w-3xl reveal-text">
+                        <span class="gold-text uppercase tracking-[0.8em] text-[9px] mb-8 block font-black">Established in Chandigarh 1924</span>
+                        <h1 class="font-luxury text-5xl md:text-7xl lg:text-8xl leading-tight mb-10 text-white font-black">
+                            <i>TIMELESS</i><br> <span class="italic text-gray-400">EVOQUE.</span>
+                        </h1>
+                        <p class="text-lg text-gray-400 mb-14 max-w-xl leading-loose font-light tracking-wide">
+                            Every EVOQUE timepiece is a masterclass in horological engineering. From the depth of the ocean to the heights of elegance, we define the rhythm of your life.
+                        </p>
+                        <div class="flex flex-wrap gap-8">
+                            <button onclick="navigateTo('shop')" class="gold-bg px-14 py-6 font-bold uppercase text-[10px] tracking-[0.4em] hover:scale-105 transition shadow-2xl">Browse Vault</button>
+                            <button onclick="navigateTo('about')" class="border border-white/20 text-white px-14 py-6 font-bold uppercase text-[10px] tracking-[0.4em] hover:bg-white hover:text-black transition">Atelier Story</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Scroll down icon -->
+                <div class="absolute bottom-10 left-10 flex flex-col items-center gap-4">
+                    <span class="text-[8px] uppercase tracking-[0.4em] text-gray-500 [writing-mode:vertical-lr]">Scroll To Discover</span>
+                    <div class="w-[1px] h-20 bg-gradient-to-b from-gold to-transparent"></div>
+                </div>
+            </div>
+
+            <!-- New Home Content: The Philosophy of Time -->
+            <div class="py-40 bg-[#050505] border-y border-white/5">
+                <div class="container mx-auto px-10">
+                    <div class="flex flex-col lg:flex-row items-center gap-24">
+                        <div class="lg:w-1/2">
+                            <h2 class="font-luxury text-4xl md:text-5xl mb-12 leading-snug">The Essence of <br> <span class="gold-text italic">Swiss Engineering.</span></h2>
+                            <p class="text-gray-400 text-lg leading-relaxed mb-12 font-light">At EVOQUE, we believe that time is the most valuable commodity. Our master watchmakers in Sector 10 Chandigarh spend hundreds of hours crafting each movement to ensure that accuracy is not just a goal, but a guarantee.</p>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
+                                <div>
+                                    <h4 class="font-luxury text-gold text-lg mb-4">Precision Caliber</h4>
+                                    <p class="text-gray-500 text-sm leading-relaxed">Our in-house movements are calibrated to within ±0.2 seconds per day, outperforming standard COSC requirements.</p>
+                                </div>
+                                <div>
+                                    <h4 class="font-luxury text-gold text-lg mb-4">Sapphire Glass</h4>
+                                    <p class="text-gray-500 text-sm leading-relaxed">Double-domed sapphire crystals with seven layers of anti-reflective coating ensure absolute clarity in any light.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:w-1/2 relative group">
+                            <div class="absolute -inset-10 bg-gold/5 blur-[100px] rounded-full group-hover:bg-gold/10 transition duration-1000"></div>
+                            <img src="https://images.unsplash.com/photo-1547996160-81dfa63595aa?auto=format&fit=crop&q=80&w=1000" class="relative z-10 rounded-2xl shadow-2xl grayscale hover:grayscale-0 transition duration-1000">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Showcase Grid: Elegant Layout -->
+            <div class="py-40 bg-black">
+                <div class="container mx-auto px-10">
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-16">
+                        <div class="space-y-8">
+                            <img src="https://images.unsplash.com/photo-1657235895095-e043ce2ebf41?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTQwfHx3YXRjaGVzfGVufDB8fDB8fHww" class="w-full h-[500px] object-cover rounded-sm grayscale hover:grayscale-0 transition duration-700">
+                            <h3 class="font-luxury text-2xl">The Chronograph Spirit</h3>
+                            <p class="text-gray-500 text-sm leading-loose">Built for the thrill of the race. Our Chrono series features tachymeter bezels and high-beat movements that capture split-second performance.</p>
+                        </div>
+                        <div class="space-y-8 pt-20">
+                            <img src="https://images.unsplash.com/photo-1712256840358-23ed3248273c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjI2fHx3YXRjaGVzfGVufDB8fDB8fHww" class="w-full h-[500px] object-cover rounded-sm grayscale hover:grayscale-0 transition duration-700">
+                            <h3 class="font-luxury text-2xl">Lunar Complications</h3>
+                            <p class="text-gray-500 text-sm leading-loose">A poetic tribute to the night sky. The moon phase indicator is hand-painted in enamel and accurate for 122 years.</p>
+                        </div>
+                        <div class="space-y-8">
+                            <img src="https://images.unsplash.com/photo-1619346270223-c137f4052523?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjc4fHx3YXRjaGVzfGVufDB8fDB8fHww" class="w-full h-[500px] object-cover rounded-sm grayscale hover:grayscale-0 transition duration-700">
+                            <h3 class="font-luxury text-2xl">Skeleton Architecture</h3>
+                            <p class="text-gray-500 text-sm leading-loose">A window into the soul of time. Every bridge and wheel is visible, showcasing the dance of mechanical perfection.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brand Metrics (Adds length and depth) -->
+            <div class="py-32 bg-zinc-950 border-t border-white/5">
+                <div class="container mx-auto px-10 text-center">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-16">
+                        <div>
+                            <span class="font-luxury text-5xl gold-text block mb-4">400h</span>
+                            <p class="text-[9px] uppercase tracking-[0.5em] text-gray-500 font-black">Assembly per unit</p>
+                        </div>
+                        <div>
+                            <span class="font-luxury text-5xl gold-text block mb-4">120</span>
+                            <p class="text-[9px] uppercase tracking-[0.5em] text-gray-500 font-black">Flagship Boutiques</p>
+                        </div>
+                        <div>
+                            <span class="font-luxury text-5xl gold-text block mb-4">18k</span>
+                            <p class="text-[9px] uppercase tracking-[0.5em] text-gray-500 font-black">Solid Gold Used</p>
+                        </div>
+                        <div>
+                            <span class="font-luxury text-5xl gold-text block mb-4">102</span>
+                            <p class="text-[9px] uppercase tracking-[0.5em] text-gray-500 font-black">Years of Heritage</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SHOP SECTION (All Watches) -->
+        <section id="shop" class="page-section">
+            <div class="container mx-auto px-10 py-24">
+                <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-10">
+                    <div>
+                        <h2 class="font-luxury text-6xl mb-6">The Vault</h2>
+                        <p class="text-gray-500 uppercase tracking-[0.5em] text-[10px] font-bold">Cataloging 30 Signature Calibers</p>
+                    </div>
+                    <div class="flex flex-wrap gap-8 border-b border-white/5 pb-4">
+                        <button onclick="filterWatches('all')" class="filter-tab text-[10px] uppercase font-bold tracking-[0.4em] pb-3 transition border-b-2 border-transparent text-gray-500 active" data-cat="all">All Items</button>
+                        <button onclick="filterWatches('Automatic')" class="filter-tab text-[10px] uppercase font-bold tracking-[0.4em] pb-3 transition border-b-2 border-transparent text-gray-500" data-cat="Automatic">Automatic</button>
+                        <button onclick="filterWatches('Chronograph')" class="filter-tab text-[10px] uppercase font-bold tracking-[0.4em] pb-3 transition border-b-2 border-transparent text-gray-500" data-cat="Chronograph">Chrono</button>
+                        <button onclick="filterWatches('Diver')" class="filter-tab text-[10px] uppercase font-bold tracking-[0.4em] pb-3 transition border-b-2 border-transparent text-gray-500" data-cat="Diver">Diver</button>
+                        <button onclick="filterWatches('Dress')" class="filter-tab text-[10px] uppercase font-bold tracking-[0.4em] pb-3 transition border-b-2 border-transparent text-gray-500" data-cat="Dress">Dress</button>
+                    </div>
+                </div>
+
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+                    <!-- Watches Injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. HERITAGE SECTION -->
+        <section id="about" class="page-section">
+            <div class="container mx-auto px-10 py-32">
+                <div class="grid lg:grid-cols-2 gap-32 items-center">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=1000" class="rounded-2xl shadow-2xl relative z-10 grayscale hover:grayscale-0 transition duration-1000">
+                        <div class="absolute -bottom-16 -right-16 gold-bg p-16 rounded-2xl hidden xl:block z-20 shadow-2xl">
+                            <p class="font-luxury text-4xl italic text-black font-black leading-none">Since <br> 1924</p>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="gold-text uppercase tracking-[0.6em] text-[10px] mb-6 block font-black">A Century of Horology</span>
+                        <h2 class="font-luxury text-7xl mb-12 leading-tight text-white italic">The Legacy of <span class="not-italic">Precision.</span></h2>
+                        <div class="space-y-8 text-gray-400 leading-relaxed font-light text-xl">
+                            <p>EVOQUE was established as a private workshop for the elite, specialized in complex astronomical complications. Today, we remain committed to that same artisanal spirit.</p>
+                            <p>Every gear is hand-polished, every screw is blued by heat, and every dial is a canvas of traditional craftsmanship. We don't just build watches; we preserve moments.</p>
+                        </div>
+                        <button onclick="navigateTo('contact')" class="mt-16 gold-text font-bold uppercase text-[10px] tracking-[0.6em] border-b-2 border-gold pb-4 hover:tracking-[0.8em] transition-all">Secure an Appointment</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. POLICY SECTION (Authenticity, Service, Press) -->
+        <section id="policy" class="page-section">
+            <div class="container mx-auto px-10 py-32 max-w-4xl">
+                <div id="policy-content" class="policy-view reveal-text">
+                    <!-- Policy Content Injected Dynamically -->
+                </div>
+                <div class="mt-20 pt-10 border-t border-white/5 text-center">
+                    <button onclick="navigateTo('home')" class="gold-text font-black uppercase text-[10px] tracking-[0.6em] hover:tracking-[0.8em] transition-all">Exit Archive</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. CONCIERGE (Contact) -->
+        <section id="contact" class="page-section">
+            <div class="container mx-auto px-10 py-32">
+                <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-32">
+                    <div>
+                        <h2 class="font-luxury text-7xl mb-12 leading-none">The Luxury <br> <span class="gold-text">Relay.</span></h2>
+                        <p class="text-gray-400 mb-20 text-xl font-light leading-relaxed">Our horological concierge is available for global shipping inquiries, technical maintenance, and bespoke build consultations.</p>
+                        
+                        <div class="space-y-12">
+                            <div class="flex gap-8 items-center">
+                                <div class="w-16 h-16 border border-gold/30 rounded-full flex items-center justify-center text-gold"><i class="fas fa-map-pin"></i></div>
+                                <div><p class="text-[10px] uppercase font-black text-gray-600 tracking-widest mb-1">Global HQ</p><p class="text-2xl font-luxury">Sector 10, Chandigarh, India</p></div>
+                            </div>
+                            <div class="flex gap-8 items-center">
+                                <div class="w-16 h-16 border border-gold/30 rounded-full flex items-center justify-center text-gold"><i class="fas fa-paper-plane"></i></div>
+                                <div><p class="text-[10px] uppercase font-black text-gray-600 tracking-widest mb-1">Email Relay</p><p class="text-2xl font-luxury">atelier@evoque.com</p></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-zinc-900/30 p-16 border border-white/5 shadow-2xl backdrop-blur-md rounded-2xl">
+                        <form class="space-y-10" onsubmit="event.preventDefault(); showModal('Success', 'Concierge relay initiated. Await contact.');">
+                            <input type="text" placeholder="Full Name" required class="w-full bg-transparent border-b border-white/10 py-5 outline-none focus:border-gold transition text-lg font-light">
+                            <input type="email" placeholder="Communication Address" required class="w-full bg-transparent border-b border-white/10 py-5 outline-none focus:border-gold transition text-lg font-light">
+                            <textarea rows="4" placeholder="How may we define your time?" required class="w-full bg-transparent border-b border-white/10 py-5 outline-none focus:border-gold transition text-lg font-light resize-none"></textarea>
+                            <button type="submit" class="w-full gold-bg py-8 font-black uppercase text-[10px] tracking-[0.5em] hover:brightness-110 transition shadow-2xl">Transmit Request</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-black border-t border-white/5 pt-32 pb-16">
+        <div class="container mx-auto px-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-24 mb-32">
+                <div class="col-span-1">
+                    <span class="font-luxury text-3xl tracking-[0.4em] gold-text uppercase block mb-10 font-black">EVOQUE</span>
+                    <p class="text-gray-500 text-sm leading-relaxed mb-10 font-light italic">The intersection of art and engineering. For those who understand that perfection is not a goal, but a starting point.</p>
+                    <div class="flex gap-8 text-gray-600">
+                        <a href="#" class="hover:text-gold transition text-xl"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="hover:text-gold transition text-xl"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="hover:text-gold transition text-xl"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+
+                <div>
+                    <h5 class="text-[10px] uppercase font-black tracking-[0.5em] gold-text mb-12">Collections</h5>
+                    <ul class="text-gray-500 text-[11px] space-y-6 font-bold tracking-[0.3em] uppercase">
+                        <li><button onclick="filterWatches('Automatic'); navigateTo('shop');" class="hover:text-gold transition">Automatic Spirits</button></li>
+                        <li><button onclick="filterWatches('Chronograph'); navigateTo('shop');" class="hover:text-gold transition">Chrono Masters</button></li>
+                        <li><button onclick="filterWatches('Diver'); navigateTo('shop');" class="hover:text-gold transition">Deep Sea Divers</button></li>
+                        <li><button onclick="filterWatches('Dress'); navigateTo('shop');" class="hover:text-gold transition">Evening & Dress</button></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 class="text-[10px] uppercase font-black tracking-[0.5em] gold-text mb-12">Registry</h5>
+                    <ul class="text-gray-500 text-[11px] space-y-6 font-bold tracking-[0.3em] uppercase">
+                        <li><button onclick="navigateTo('policy', 'authenticity')" class="hover:text-gold transition">Authenticity</button></li>
+                        <li><button onclick="navigateTo('policy', 'service')" class="hover:text-gold transition">Service Centers</button></li>
+                        <li><button onclick="navigateTo('policy', 'press')" class="hover:text-gold transition">Press Inquiries</button></li>
+                        <li><button onclick="navigateTo('contact')" class="hover:text-gold transition">Atelier Relay</button></li>
+                    </ul>
+                </div>
+
+                <!-- DEVELOPER CARD -->
+                <div class="bg-zinc-950 p-10 border border-white/5 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition duration-1000">
+                        <i class="fas fa-code text-5xl gold-text"></i>
+                    </div>
+                    <div class="flex items-center gap-6 mb-8">
+                        <div class="w-16 h-16 rounded-full border-2 border-gold overflow-hidden flex items-center justify-center bg-black">
+                            <!-- DEVELOPER PHOTO -->
+                            <!-- Replace 'YOUR_IMAGE_URL' with your actual link -->
+                            <img src="Heaven.jpeg" alt="Heavenpreet Kaur" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" class="w-full h-full object-cover">
+                            <i class="fas fa-user-circle text-gray-700 text-3xl" style="display:none;"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white text-md tracking-widest">Heavenpreet Kaur</h4>
+                            <p class="text-[8px] gold-text uppercase font-black tracking-widest">Lead Developer</p>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-gray-500 leading-relaxed mb-8 font-light italic">
+                        Student at DAV-10 Chandigarh, PGDCA, Panjab University. Building the digital heartbeat of modern luxury.
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-[8px] uppercase font-bold text-gray-600 tracking-[0.3em]">Online in Atelier</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-t border-white/5 pt-12 flex flex-col md:flex-row justify-between items-center text-gray-700 text-[10px] uppercase font-bold tracking-[0.6em]">
+                <p>&copy; 2026 EVOQUE HOROLOGY GLOBAL. PRECISION REIMAGINED.</p>
+                <div class="flex gap-12 mt-8 md:mt-0">
+                    <p class="hover:text-gold transition cursor-pointer">Privacy</p>
+                    <p class="hover:text-gold transition cursor-pointer">Terms</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- CART SIDEBAR -->
+    <div id="cart-sidebar" class="fixed top-0 right-0 h-full w-full md:w-[500px] bg-[#050505] text-white z-[200] translate-x-full transition-transform duration-700 shadow-2xl border-l border-white/5">
+        <div class="p-16 flex flex-col h-full">
+            <div class="flex justify-between items-center mb-20">
+                <h3 class="font-luxury text-5xl">Selected <br> <span class="gold-text italic">Timepieces</span></h3>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-white transition"><i class="fas fa-times text-2xl"></i></button>
+            </div>
+
+            <div id="cart-items" class="flex-grow overflow-y-auto space-y-12 custom-scroll pr-4">
+                <div class="text-center py-20 opacity-20 uppercase text-[9px] tracking-[0.5em] font-black">The vault is currently empty.</div>
+            </div>
+
+            <div class="pt-16 border-t border-white/10">
+                <div class="flex justify-between items-center mb-10">
+                    <span class="text-gray-500 uppercase text-[10px] tracking-[0.4em] font-bold">Invested Total</span>
+                    <span id="cart-total" class="text-4xl font-luxury gold-text">$0.00</span>
+                </div>
+                <button class="w-full gold-bg py-8 rounded-full font-black uppercase text-[10px] tracking-[0.4em] hover:brightness-110 transition shadow-2xl">Finalize Acquisition</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- WATCH DATABASE (30 UNIQUE PIECES) ---
+        const products = [
+            // AUTOMATIC
+            { id: 1, name: 'Royal Onyx V', price: 12500, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1622434641406-a158123450f9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 2, name: 'Lunar Phase G', price: 21000, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1620625515032-6ed0c1790c75?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8d2F0Y2hlc3xlbnwwfHwwfHx8MA%3D%3D' },
+            { id: 3, name: 'Skeleton Void', price: 29500, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8d2F0Y2hlc3xlbnwwfHwwfHx8MA%3D%3D' },
+            { id: 4, name: 'Titanium Edge', price: 22000, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1614164185128-e4ec99c436d7' },
+            { id: 5, name: 'Cosmos Tourbillon', price: 45000, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1547996160-81dfa63595aa' },
+            { id: 6, name: 'Nebula Pro', price: 18500, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8d2F0Y2hlc3xlbnwwfHwwfHx8MA%3D%3D' },
+            { id: 7, name: 'Apex Spirit', price: 11200, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30' },
+            { id: 8, name: 'Quantum Silver', price: 24500, cat: 'Automatic', img: 'https://images.unsplash.com/photo-1594534475808-b18fc33b045e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTh8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            
+            // CHRONOGRAPH
+            { id: 9, name: 'Chrono-X Carbon', price: 8900, cat: 'Chronograph', img: 'https://images.unsplash.com/photo-1524592094714-0f0654e20314' },
+            { id: 10, name: 'Aero-Speed Pro', price: 7400, cat: 'Chronograph', img: 'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 11, name: 'Rally Timer 01', price: 6800, cat: 'Chronograph', img: 'https://images.unsplash.com/photo-1629581678313-36cf745a9af9?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTl8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 12, name: 'Mach 1 Racing', price: 8100, cat: 'Chronograph', img: 'https://images.unsplash.com/photo-1695345272166-4efd76dd7a21?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjJ8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 13, name: 'Vector Chrono', price: 5900, cat: 'Chronograph', img: 'https://images.unsplash.com/photo-1639006570490-79c0c53f1080?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjR8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 14, name: 'Grand Prix 88', price: 10500, cat: 'Chronograph', img: 'https://images.unsplash.com/photo-1585123334904-845d60e97b29?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjZ8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 15, name: 'Vortex Split', price: 12800, cat: 'Chronograph', img: 'https://images.unsplash.com/photo-1703505841379-2f863b201212?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDh8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            
+            // DIVER
+            { id: 16, name: 'Abyss Master 300', price: 15400, cat: 'Diver', img: 'https://images.unsplash.com/photo-1670404160620-a3a86428560e?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDZ8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 17, name: 'Sub-Zero Steel', price: 12900, cat: 'Diver', img: 'https://images.unsplash.com/photo-1662384197911-e82189f4dc60?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDN8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 18, name: 'Deep Sea Blue', price: 18700, cat: 'Diver', img: 'https://images.unsplash.com/photo-1619134778706-7015533a6150?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTB8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 19, name: 'Kraken Black', price: 13500, cat: 'Diver', img: 'https://images.unsplash.com/photo-1634141628215-732e10d16bec?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NzB8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 20, name: 'Marine Guard', price: 14200, cat: 'Diver', img: 'https://images.unsplash.com/photo-1549972574-8e3e1ed6a347?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NTZ8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 21, name: 'Triton Silver', price: 16400, cat: 'Diver', img: 'https://images.unsplash.com/photo-1600003014755-ba31aa59c4b6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDR8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 22, name: 'Leviathan Grey', price: 14900, cat: 'Diver', img: 'https://images.unsplash.com/photo-1612817159623-0399784fd0ce?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjB8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            
+            // DRESS
+            { id: 23, name: 'The Diplomat', price: 5600, cat: 'Dress', img: 'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6' },
+            { id: 24, name: 'The Heritage XL', price: 4200, cat: 'Dress', img: 'https://images.unsplash.com/photo-1548171916-c0dea7f94ca6?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjZ8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 25, name: 'Gilded Evening', price: 9200, cat: 'Dress', img: 'https://images.unsplash.com/photo-1533139502658-0198f920d8e8' },
+            { id: 26, name: 'Ivory Executive', price: 3800, cat: 'Dress', img: 'https://images.unsplash.com/photo-1623998021661-dc7555b2213d?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NzJ8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 27, name: 'The Minimalist', price: 2900, cat: 'Dress', img: 'https://images.unsplash.com/photo-1616928231359-fc8b7e244c3b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8ODN8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 28, name: 'Midnight Affair', price: 7100, cat: 'Dress', img: 'https://images.unsplash.com/photo-1689287428096-7e1dcc705a5c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OTh8fHdhdGNoZXN8ZW58MHx8MHx8fDA%3D' },
+            { id: 29, name: 'Classic Gold 19', price: 8500, cat: 'Dress', img: 'https://images.unsplash.com/photo-1619976442556-210d9a914669?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTAwfHx3YXRjaGVzfGVufDB8fDB8fHww' },
+            { id: 30, name: 'Presidential Gold', price: 15500, cat: 'Dress', img: 'https://images.unsplash.com/photo-1600003014608-c2ccc1570a65?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjI3fHx3YXRjaGVzfGVufDB8fDB8fHww' }
+        ];
+
+        let cart = [];
+
+        // --- CORE NAVIGATION ---
+        function navigateTo(pageId, extra = null) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('gold-text'));
+            
+            const target = document.getElementById(pageId);
+            if(target) target.classList.add('active');
+            
+            const activeBtn = document.getElementById('nav-' + pageId);
+            if(activeBtn) activeBtn.classList.add('gold-text');
+            
+            if(pageId === 'shop') filterWatches(extra || 'all');
+            if(pageId === 'policy' && extra) loadPolicy(extra);
+            
+            window.scrollTo(0, 0);
+        }
+
+        // --- WATCH FILTERING ENGINE ---
+        function filterWatches(category) {
+            const grid = document.getElementById('product-grid');
+            const filtered = category === 'all' ? products : products.filter(p => p.cat === category);
+            
+            grid.innerHTML = filtered.map(p => `
+                <div class="watch-card p-10 flex flex-col group relative">
+                    <div class="relative overflow-hidden mb-10 aspect-[4/5] bg-zinc-950">
+                        <img src="${p.img}?auto=format&fit=crop&q=80&w=600" alt="${p.name}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-all duration-700 flex items-center justify-center">
+                            <button onclick="addToCart(${p.id})" class="gold-bg w-16 h-16 rounded-full flex items-center justify-center hover:scale-110 transition shadow-2xl">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-auto text-center px-4">
+                        <p class="text-[8px] uppercase tracking-[0.6em] text-gray-600 mb-3 font-black">${p.cat}</p>
+                        <h4 class="font-luxury text-2xl mb-6 group-hover:gold-text transition">${p.name}</h4>
+                        <p class="text-xl gold-text font-black tracking-widest">$${p.price.toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active', 'gold-text', 'border-gold');
+                if(tab.dataset.cat === category) tab.classList.add('active', 'gold-text', 'border-gold');
+            });
+        }
+
+        // --- CART ENGINE ---
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('translate-x-full');
+        }
+
+        function addToCart(id) {
+            const item = products.find(p => p.id === id);
+            cart.push(item);
+            updateCartUI();
+            showModal('Registry Secured', `${item.name} has been synchronized with the vault.`);
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cart-items');
+            const totalDisplay = document.getElementById('cart-total');
+            document.getElementById('cart-count').innerText = cart.length;
+
+            if(cart.length === 0) {
+                container.innerHTML = '<div class="text-center py-20 opacity-20 uppercase text-[9px] tracking-[0.5em] font-black">Vault is currently empty.</div>';
+                totalDisplay.innerText = '$0.00';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((item, index) => {
+                total += item.price;
+                return `
+                    <div class="flex gap-8 items-center border-b border-white/5 pb-10 group">
+                        <img src="${item.img}" class="w-24 h-24 object-cover border border-white/5 group-hover:border-gold transition">
+                        <div class="flex-grow">
+                            <h5 class="font-luxury text-xl mb-2 italic text-white">${item.name}</h5>
+                            <p class="text-[9px] uppercase gold-text tracking-[0.2em] font-black">$${item.price.toLocaleString()}.00</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-gray-700 hover:text-white transition"><i class="fas fa-times"></i></button>
+                    </div>
+                `;
+            }).join('');
+            totalDisplay.innerText = `$${total.toLocaleString()}.00`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        // --- POLICY & HUB CONTENT ---
+        function loadPolicy(type) {
+            const target = document.getElementById('policy-content');
+            const policies = {
+                authenticity: `
+                    <h2>The <span class="gold-text">Authenticity</span> Creed</h2>
+                    <p>Every EVOQUE timepiece is more than a product; it is a registered artifact. Our blockchain-integrated registry ensures that your acquisition is immutable and globally recognized for its pedigree.</p>
+                    <h3>Digital Signature</h3>
+                    <p>Within every caliber resides a microscopic NFC chip, invisible to the eye but accessible to our encrypted atelier application. It reveals the assembly date, the master horologist's signature, and the unique timing calibration chart of your specific watch.</p>
+                    <h3>GIA & COSC</h3>
+                    <p>Our diamonds are GIA certified, and our movements undergo rigorous testing at the Contrôle Officiel Suisse des Chronomètres. We accept nothing less than mathematical absolute.</p>
+                `,
+                service: `
+                    <h2>Global <span class="gold-text">Overhaul</span> Network</h2>
+                    <p>A precision instrument requires meticulous care to endure generations. EVOQUE provides lifetime technical support through our global web of laboratories.</p>
+                    <h3>The Sector 10 Atelier</h3>
+                    <p>Our main facility in Chandigarh is equipped with climate-controlled, dust-free chambers where tourbillons and minute repeaters are restored to factory specification.</p>
+                    <h3>Royal Pickup</h3>
+                    <p>Owners of our Royal series enjoy complimentary global pickup and delivery via specialized secure transit. Your timepiece never leaves protected custody.</p>
+                `,
+                press: `
+                    <h2>Press <span class="gold-text">Archive</span></h2>
+                    <p>For international media, lookbook requests, or collaboration proposals, our Global PR Relay is available for secure communication.</p>
+                    <h3>2026 Horology Whitepaper</h3>
+                    <p>Download our technical analysis on the new Vortex-Tourbillon 7 and the application of aerospace-grade materials in our Diver series.</p>
+                    <button class="gold-bg px-12 py-5 mt-10 font-black uppercase text-[9px] tracking-widest shadow-xl">Download Global Press Kit</button>
+                `
+            };
+            target.innerHTML = policies[type] || '<p>Content pending synchronization.</p>';
+        }
+
+        // --- UTILITIES ---
+        function showModal(title, msg) {
+            const modal = document.getElementById('status-modal');
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-msg').innerText = msg;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('status-modal').classList.remove('active');
+        }
+
+        function toggleMobileMenu() {
+            // Implementation for mobile menu toggle if needed
+            showModal('Mobile View', 'Navigation menu for mobile devices is active.');
+        }
+
+        // --- INIT ---
+        window.onload = () => {
+            filterWatches('all');
+            loadPolicy('authenticity');
+        };
+    </script>
+</body>
+</html>
